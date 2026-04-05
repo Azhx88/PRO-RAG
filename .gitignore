@@ -1,0 +1,48 @@
+# Node
+node_modules/
+dist/
+build/
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+env.bak/
+venv.bak/
+
+# Environment files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+
+# Custom
+*.log
+.claude
+
+# Uploads (user data, generated charts/exports)
+uploads/
+
+# Debug/test artifacts
+check_cgpa.py
+check_db.py
+cgpa_result.txt
+process_error.txt
+diag_output.txt
+ws2_schema.json
+backend_logs.txt
+postgres_logs.txt
