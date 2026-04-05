@@ -45,6 +45,36 @@ def _save_to_memory(session_id: int, question: str, sql: str, results: list[dict
     })
 
 
+def _load_memory_from_db(session_id: int, db: Session):
+    """Rehydrate conversation memory from DB for a resumed session."""
+    messages = (
+        db.query(ChatMessage)
+        .filter(ChatMessage.session_id == session_id)
+        .order_by(ChatMessage.created_at.asc())
+        .all()
+    )
+    _conversation_memory[session_id] = deque(maxlen=MAX_MEMORY)
+    user_questions = {}
+    for msg in messages:
+        if msg.role == "user":
+            user_questions[msg.id] = msg.content
+    # Walk assistant messages that have SQL metadata
+    prev_user_content = None
+    for msg in messages:
+        if msg.role == "user":
+            prev_user_content = msg.content
+        elif msg.role == "assistant" and msg.meta:
+            mode = msg.meta.get("mode", "")
+            sql = msg.meta.get("sql", "")
+            if mode in ("sql", "sql_retry") and sql and prev_user_content:
+                _conversation_memory[session_id].append({
+                    "question": prev_user_content,
+                    "sql": sql,
+                    "row_count": msg.meta.get("row_count", 0),
+                    "columns": list((msg.meta.get("results_preview") or [{}])[0].keys()),
+                })
+
+
 class ChatRequest(BaseModel):
     workspace_id: int
     query: str
@@ -67,6 +97,9 @@ def send_message(
     # Get or create session
     if req.session_id:
         session = db.query(ChatSession).filter(ChatSession.id == req.session_id).first()
+        # Rehydrate memory from DB if this session isn't already in memory
+        if session and session.id not in _conversation_memory:
+            _load_memory_from_db(session.id, db)
     else:
         session = ChatSession(user_id=current_user.id, workspace_id=req.workspace_id)
         db.add(session)
@@ -204,6 +237,10 @@ def send_message(
             chunks = retrieve_chunks(req.query, req.workspace_id, db)
             answer = generate_rag_response(req.query, chunks)
             response_metadata["sources_count"] = len(chunks)
+            response_metadata["sources"] = [
+                {"filename": c["filename"], "chunk_index": c["index"], "score": c["score"]}
+                for c in chunks
+            ]
 
     except Exception as e:
         answer = f"Error processing your query: {str(e)}"

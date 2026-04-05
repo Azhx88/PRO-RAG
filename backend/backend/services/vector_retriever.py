@@ -33,7 +33,8 @@ def retrieve_chunks(query: str, workspace_id: int, db: Session) -> list[dict]:
         chunks.append({
             "text": row[0],
             "index": row[1],
-            "filename": row[2]
+            "filename": row[2],
+            "score": round(float(row[3]), 4)
         })
     return chunks
 

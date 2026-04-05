@@ -23,7 +23,7 @@ def get_file_type(filename: str) -> str:
     raise HTTPException(status_code=400, detail=f"Unsupported file type: {ext}")
 
 @router.post("/upload")
-async def upload_file(
+def upload_file(
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
