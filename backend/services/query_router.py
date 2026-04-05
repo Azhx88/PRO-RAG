@@ -70,6 +70,24 @@ def detect_intent(query: str) -> dict:
         "is_data_query": is_data_query(query),
     }
 
+def is_greeting(query: str) -> bool:
+    """
+    Returns True only for pure social messages (hi, thanks, bye).
+    Used by the vector RAG path — everything else should go to retrieval.
+    """
+    q = query.lower().strip()
+    for pattern in GENERAL_CHAT_PATTERNS:
+        if re.match(pattern, q, re.IGNORECASE):
+            return True
+    # Very short (1-2 words) with no question intent
+    words = q.split()
+    if len(words) <= 2 and "?" not in q and not any(
+        q.startswith(w) for w in ("what", "who", "wt", "where", "when", "how", "why", "which", "is", "are", "does", "do", "can", "tell")
+    ):
+        return True
+    return False
+
+
 def auto_detect_file(query: str, workspaces: list) -> dict | None:
     """
     Try to match query to a file by filename keywords.

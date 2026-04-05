@@ -9,7 +9,7 @@ from models.user import User
 from models.file_workspace import FileWorkspace
 from models.chat import ChatSession, ChatMessage
 from utils.auth_utils import get_current_user
-from services.query_router import detect_intent
+from services.query_router import detect_intent, is_greeting
 from services.sql_retriever import generate_sql, execute_sql, generate_insights
 from services.vector_retriever import retrieve_chunks, generate_rag_response
 from services.chart_generator import generate_chart, detect_chart_type
@@ -229,7 +229,7 @@ def send_message(
 
         else:
             # Vector RAG path
-            if not intent["is_data_query"]:
+            if is_greeting(req.query):
                 # General greeting/chat — don't waste an embedding call
                 answer = call_groq(
                     req.query,
