@@ -229,13 +229,23 @@ def send_message(
 
         else:
             # Vector RAG path
-            chunks = retrieve_chunks(req.query, req.workspace_id, db)
-            answer = generate_rag_response(req.query, chunks)
-            response_metadata["sources_count"] = len(chunks)
-            response_metadata["sources"] = [
-                {"filename": c["filename"], "chunk_index": c["index"], "score": c["score"]}
-                for c in chunks
-            ]
+            if not intent["is_data_query"]:
+                # General greeting/chat — don't waste an embedding call
+                answer = call_groq(
+                    req.query,
+                    system="You are a helpful assistant. The user has uploaded a document. "
+                           "Answer their general message naturally. If they seem to want information "
+                           "from the document, suggest they ask a specific question about it.",
+                )
+                response_metadata["mode"] = "general_chat"
+            else:
+                chunks = retrieve_chunks(req.query, req.workspace_id, db)
+                answer = generate_rag_response(req.query, chunks)
+                response_metadata["sources_count"] = len(chunks)
+                response_metadata["sources"] = [
+                    {"filename": c["filename"], "chunk_index": c["index"], "score": c["score"]}
+                    for c in chunks
+                ]
 
     except Exception as e:
         answer = f"Error processing your query: {str(e)}"
