@@ -1,37 +1,43 @@
-export default function WorkspacePanel({ onFilesChange, onSelectWorkspace }) {
+export default function WorkspacePanel() {
   return (
     <div style={{
       flex: 1, display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'center',
-      padding: '48px', textAlign: 'center'
+      padding: '48px', textAlign: 'center', background: 'var(--bg-base)',
+      position: 'relative', overflow: 'hidden'
     }}>
-      <div style={{
-        width: '72px', height: '72px', background: 'var(--accent-muted)',
-        borderRadius: '20px', display: 'flex', alignItems: 'center',
-        justifyContent: 'center', marginBottom: '24px', fontSize: '36px'
-      }}>
-        ⬡
-      </div>
-      <h2 style={{ fontSize: '22px', fontWeight: 600, marginBottom: '12px' }}>Select a workspace</h2>
-      <p style={{ color: 'var(--text-secondary)', maxWidth: '360px', fontSize: '14px', lineHeight: 1.7 }}>
-        Upload an Excel, CSV, PDF, or text file from the sidebar. Then ask any question — the system will automatically route your query to SQL or RAG.
-      </p>
-      <div style={{
-        marginTop: '40px', display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center'
-      }}>
-        {[
-          { label: 'Excel / CSV', desc: 'SQL retrieval + dashboard', color: '#4CAF7D' },
-          { label: 'PDF / Text', desc: 'Vector RAG pipeline', color: '#E8A84A' }
-        ].map(item => (
-          <div key={item.label} style={{
-            padding: '20px 24px', background: 'var(--bg-card)',
-            borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)',
-            minWidth: '160px'
-          }}>
-            <div style={{ fontWeight: 600, color: item.color, marginBottom: '6px' }}>{item.label}</div>
-            <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{item.desc}</div>
-          </div>
-        ))}
+      {/* Background glow */}
+      <div style={{ position: 'absolute', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(99,102,241,0.06) 0%, transparent 65%)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} />
+
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{
+          width: '68px', height: '68px', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+          borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto 24px', fontSize: '30px', boxShadow: '0 8px 32px rgba(99,102,241,0.3)'
+        }}>✦</div>
+
+        <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '10px', letterSpacing: '-0.3px' }}>
+          Select a workspace
+        </h2>
+        <p style={{ color: 'var(--text-secondary)', maxWidth: '340px', fontSize: '14px', lineHeight: 1.7, margin: '0 auto 36px' }}>
+          Upload a file from the sidebar, then ask any question. Queries are automatically routed to the right pipeline.
+        </p>
+
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          {[
+            { icon: '📊', label: 'Excel / CSV', desc: 'SQL retrieval + charts', color: '#10B981', bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)' },
+            { icon: '📄', label: 'PDF / Text',  desc: 'Semantic vector search',  color: '#F59E0B', bg: 'rgba(245,158,11,0.08)',  border: 'rgba(245,158,11,0.2)' },
+          ].map(item => (
+            <div key={item.label} style={{
+              padding: '18px 22px', background: item.bg, borderRadius: 'var(--radius-xl)',
+              border: `1px solid ${item.border}`, minWidth: '150px', textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '24px', marginBottom: '8px' }}>{item.icon}</div>
+              <div style={{ fontWeight: 600, color: item.color, fontSize: '13px', marginBottom: '4px' }}>{item.label}</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{item.desc}</div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
