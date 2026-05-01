@@ -82,4 +82,4 @@ All read from `.env` via `backend/config.py:1`. Required:
 
 | Topic | File |
 |---|---|
-| Architectural patterns & design decisions | `.claude/docs/architectural_patterns.md` |
+| Architectural patterns & design decisions | `/docs/architectural_patterns.md` |
